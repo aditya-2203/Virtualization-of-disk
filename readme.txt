@@ -21,11 +21,24 @@ ___________
 
 Design:
 _______
-
+Block_size : 100 bytes.
+V : Array of size: 500 which acts as a virtual memory.
+A, B : Actual disks of size 200 and 300 blocks respectively.
+Api call Read_Block(block_no, data[, size, offset]): reads "size" bytes data from block "block_no" from V at offset "offset" and returns data into "data". Data size is typically the amount of data present in that block after offset. If size and offset are not given then bydefault size is the size of the block and offset is 0.
+Api call Write_Block(block_no, data[, offset]): writes data "data" at offset "offset" into block "block_no" of V. If any data is present initially it simply overwrites it. If data size is more than that of the size left in that block after offset it gives an error saying "data size exceeds the block size". If offset is not given then it takes 0.
+User can create multiple disks on top of it by specyfying disk ids viz. 1,2...k (for k number of disks) and the number of blocks which it would contain.
+Api call Create_Disk(id, num_blocks): stores a list of blocks for that disk that maps to blocks of virtual disk which are free.
+Free_Block_List: stores all the blocks which are free in V.
+Map M1 : for mapping ith block of virtual space to blocks of actual disks A, B (consisting of 200 and 300 blocks respectively).
+Actual data is stored in A,B.
+Api call Delete_Disk(id): simply deletes the disk and corresponding blocks from virtual space V as well as actual disks A, B and adds the blocks to the free block list.
+Api call Read_Block(disk_id, block_no, data[, size, offset]): reads data into "data" at offset "offset" from  block "block_no" of disk "disk_id" which the user created intially after checking if the disks exists otherwise throws an exception. Default values of size and offset are same as the previous Read_Block(...) api call.
+Api call Write_Block(disk_id, block_no, data[, offset]): writes data "data" into block "block_id" of disk "disk_id" at offset "offset". Offset is by default 0. If disk "disk_id" does not exists then it throws an exception.
+All cases of limitations on the values of all the data structures used are handled and throw corresponding exceptions and errors.
 
 Implementation:
 _______________
-
+Refer code section.
 
 Part 2: Disk Virtualization : Block Replication
 ===============================================
@@ -42,11 +55,16 @@ ___________
 
 Design:
 _______
-
+Basic design is same as the previous part except of the following changes.
+Map M2: stores a mapping of (block_id1, block_id2) for replication. Both the blocks have the same data.
+The primary block is one which is kept in the block list of a disk and by default read occurs from that.
+In case of write first primary copy is written and then corresponding replica is written.
+When there is an error reading from primary block, read is made from the corresponding replica and another copy is created before data is transferred to the useer and mapping M2 is updated by adding the new replica mapping and removing the old replica mapping.
+For simulating the read error (we can't corrupt a block of our hard disk!) before reading a block we generated a random number in the range 1-100. If the value is less than 10, we assumed reading the first copy has given an error.
 
 Implementation:
 _______________
-
+Refer code section.
 
 Part 3: Disk Virtualization (Snapshotting)
 ==========================================
@@ -68,5 +86,5 @@ _______
 
 Implementation:
 _______________
-
+Refer code section.
 
