@@ -17,7 +17,7 @@ free_blocks=[]
 for i in range(0,500):
 	free_blocks.append(i);
 
-#list for eah block if it free or not
+#list for each block if it free or not
 # 1 if it is free else 0
 virtualblock_status=[]
 for i in range(0,500):
@@ -39,3 +39,13 @@ for i in range(0,300):
 disk_B=[]
 for i in range(0,200):
 	disk_B.append(bytearray(100));	
+
+#getting id for new virtual disk
+def get_newdisk_id():
+	max_till_now1=-1
+	global virtualdisk_size
+	for key in virtualdisk_size:
+		print key
+		if(key>max_till_now1):
+			max_till_now1=key
+	return (max_till_now1+1)	
