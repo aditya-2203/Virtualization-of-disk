@@ -5,7 +5,7 @@ virtualdisk_block=defaultdict(list)
 
 #size of each virtual disk mapping
 virtualdisk_size={}
-
+checkpoint_no=0;
 #list contain second copy for all block
 # 0 if second copy, -1 if no copy 
 second_copy=[]

@@ -44,7 +44,7 @@ def write_data(block_no,offset,data):
 	else:
 		print "invalid block no"
 		return False;
-	if(block_no not in free_blocks):
+	if(block_no in free_blocks):
 		free_blocks.remove(block_no)
 		virtualblock_status[block_no]=0;				
 	return True
@@ -77,3 +77,24 @@ def delete_disk(id):
 	del disks.virtualdisk_size[id]
 	del disks.virtualdisk_block[id]						
 	return True
+import pickle	
+def create_checkpoint():
+	id=disks.checkpoint_no;
+	disks.checkpoint_no+=1;
+	filename="checkpoint_"+str(id)+"_";
+	pickle.dump(disks.virtualdisk_block,open(filename+"virtualdisk_block","wb"));
+	pickle.dump(disks.second_copy,open(filename+"second_copy","wb"));
+	pickle.dump(disks.free_blocks,open(filename+"free_blocks","wb"));
+	pickle.dump(disks.virtualblock_status,open(filename+"virtualblock_status","wb"));
+	pickle.dump(disks.disk_A,open(filename+"disk_A","wb"));
+	pickle.dump(disks.disk_B,open(filename+"disk_B","wb"));
+	return id;
+def restore_checkpoint(id):
+	filename="checkpoint_"+str(id)+"_";
+	disks.virtualdisk_block=pickle.load(open(filename+"virtualdisk_block","rb"));
+	disks.second_copy=pickle.load(open(filename+"second_copy","rb"));
+	disks.free_blocks=pickle.load(open(filename+"free_blocks","rb"));
+	disks.virtualblock_status=pickle.load(open(filename+"virtualblock_status","rb"));
+	disks.disk_A=pickle.load(open(filename+"disk_A","rb"));
+	disks.disk_B=pickle.load(open(filename+"disk_B","rb"));
+
