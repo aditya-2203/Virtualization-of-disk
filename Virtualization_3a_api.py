@@ -65,8 +65,6 @@ def disk_read(id,block_no,offset,data,length):
 	#Simulate the random error.
 	number  =  random.randint(0,100)
 	block_no = disks.virtualdisk_block[id][block_no-1]	#Get the virtual block.
-	print block_no,number,'num'
-	number=0
 	if number < 10:		
 		#Data is read from duplicate copy.
 		dblock_no = disks.second_copy[block_no]
@@ -78,10 +76,8 @@ def disk_read(id,block_no,offset,data,length):
 			return False	
 		else:
 			pblock_no = disks.free_blocks[0]
-		print pblock_no
 		#Retrieve block data from duplicate block. 		
 		block_data = read_data(data,dblock_no,0,100)
-		print block_data,dblock_no
 		if not(write_data(pblock_no,0,block_data)):
 			return False
 		#Mapping between duplicate block and new block.
