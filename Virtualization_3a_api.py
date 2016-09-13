@@ -147,4 +147,27 @@ def TestWrite():
 	print read_data(data,12,0,100),'Case 7'	
 	print data
 	print disks.virtualdisk_block[0],disks.virtualdisk_block[1],2 in disks.free_blocks
+
+import pickle	
+def create_checkpoint():
+	id=disks.checkpoint_no;
+	disks.checkpoint_no+=1;
+	filename="checkpoint_"+str(id)+"_";
+	pickle.dump(disks.virtualdisk_block,open(filename+"virtualdisk_block","wb"));
+	pickle.dump(disks.second_copy,open(filename+"second_copy","wb"));
+	pickle.dump(disks.free_blocks,open(filename+"free_blocks","wb"));
+	pickle.dump(disks.virtualblock_status,open(filename+"virtualblock_status","wb"));
+	pickle.dump(disks.disk_A,open(filename+"disk_A","wb"));
+	pickle.dump(disks.disk_B,open(filename+"disk_B","wb"));
+	return id;
+def restore_checkpoint(id):
+	filename="checkpoint_"+str(id)+"_";
+	disks.virtualdisk_block=pickle.load(open(filename+"virtualdisk_block","rb"));
+	disks.second_copy=pickle.load(open(filename+"second_copy","rb"));
+	disks.free_blocks=pickle.load(open(filename+"free_blocks","rb"));
+	disks.virtualblock_status=pickle.load(open(filename+"virtualblock_status","rb"));
+	disks.disk_A=pickle.load(open(filename+"disk_A","rb"));
+	disks.disk_B=pickle.load(open(filename+"disk_B","rb"));
+
 TestWrite()
+
