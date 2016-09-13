@@ -82,7 +82,7 @@ ___________
 
 Design:
 _______
-
+We dump the state of our model which includes the mappings and the data at the time when user requests a snapshot. Before dumping we track the id of the snapshot and append the dump file name with this id and whena user does a rollback we simply search for all the snapshots and model is rolled back to the state whose id is matched with what user has provided.
 
 Implementation:
 _______________
