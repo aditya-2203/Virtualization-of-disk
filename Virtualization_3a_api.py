@@ -45,9 +45,9 @@ def write_data(block_no,offset,data):
 	else:
 		print "invalid block no"
 		return False;
-	if(block_no in free_blocks):
-		free_blocks.remove(block_no)
-		virtualblock_status[block_no]=0;				
+	if(block_no in disks.free_blocks):
+		disks.free_blocks.remove(block_no)
+		disks.virtualblock_status[block_no]=0;				
 	return True
 def create_disk(id,no_blocks):
 	id=disks.get_newdisk_id()
@@ -66,7 +66,7 @@ def disk_read(id,block_no,offset,data,length):
 	number  =  random.randint(0,100)
 	if number < 10:		
 		#Data is read from duplicate copy.
-		dblock_no = disks.second_block[block_no]
+		dblock_no = disks.second_copy[block_no]
 		disks.second_copy[block_no]=-1		
 		data = read_data(data,dblock_no,offset,length)
 		#Pick up another block for replication.
@@ -83,7 +83,7 @@ def disk_read(id,block_no,offset,data,length):
 		disks.second_copy[dblock_no] = pblock_no
 	else:
 		#Data is read from primary block number.
-		data = read_write(data,block_no,offset,length)
+		data = read_data(data,block_no,offset,length)
 	return data
 
 def disk_write(id,block_no,offset,data):
