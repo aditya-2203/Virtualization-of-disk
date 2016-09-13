@@ -1,13 +1,13 @@
 import Virtualization_3a_helper as disks
 import random
 def read_data(data,block_no,offset,length):
-	if(offset+length>=100):
+	if(offset+length>100):		#Removed the equality condition
 		print "invalid length"
-		data=null
+		data=None	#null is not defined in python.
 		return
 	if(block_no>=500):
 		print "invalid block number"
-		data=null
+		data=None
 		return	
 	(disk_id,block_id)=disks.virtualblock_physical(block_no)
 	data=""
@@ -20,12 +20,12 @@ def read_data(data,block_no,offset,length):
 			temp_byte.append(disks.disk_B[block_id][i]);
 	else:
 		print "invalid block no"
-		data=null;
-		return;
+		data=None
+		return
 	data="".join(map(chr,temp_byte))				
 	return data
 def write_data(block_no,offset,data):
-	if(offset+len(data)>=100):
+	if(offset+len(data)>100):	 #Removed the equality condition.
 		print "invalid length"
 		return False
 	if(block_no>=500):
@@ -45,7 +45,7 @@ def write_data(block_no,offset,data):
 	else:
 		print "invalid block no"
 		return False;
-	if(block_no not in free_blocks):
+	if(block_no in disks.free_blocks):
 		disks.free_blocks.remove(block_no)
 		disks.virtualblock_status[block_no]=0;				
 	return True
@@ -64,9 +64,12 @@ def create_disk(id,no_blocks):
 def disk_read(id,block_no,offset,data,length):
 	#Simulate the random error.
 	number  =  random.randint(0,100)
+	block_no = disks.virtualdisk_block[id][block_no-1]	#Get the virtual block.
+	print block_no,number,'num'
+	number=0
 	if number < 10:		
 		#Data is read from duplicate copy.
-		dblock_no = disks.second_block[block_no]
+		dblock_no = disks.second_copy[block_no]
 		disks.second_copy[block_no]=-1		
 		data = read_data(data,dblock_no,offset,length)
 		#Pick up another block for replication.
@@ -75,15 +78,17 @@ def disk_read(id,block_no,offset,data,length):
 			return False	
 		else:
 			pblock_no = disks.free_blocks[0]
+		print pblock_no
 		#Retrieve block data from duplicate block. 		
 		block_data = read_data(data,dblock_no,0,100)
+		print block_data,dblock_no
 		if not(write_data(pblock_no,0,block_data)):
 			return False
 		#Mapping between duplicate block and new block.
 		disks.second_copy[dblock_no] = pblock_no
 	else:
 		#Data is read from primary block number.
-		data = read_write(data,block_no,offset,length)
+		data = read_data(data,block_no,offset,length)
 	return data
 
 def disk_write(id,block_no,offset,data):
@@ -123,3 +128,23 @@ def delete_disk(id):
 	del disks.virtualdisk_size[id]
 	del disks.virtualdisk_block[id]						
 	return True
+
+
+def TestWrite():
+	data = "i m well under 100 characters"
+	next = "Well under 4 years"
+	write_data(1,50,data)
+	write_data(1,54,next)
+	print read_data(data,1,40,70),' Case 1'
+	print read_data(data,9,10,80),' Case 2'
+	print read_data(data,1,50,30),' Case 3'
+	print 1 in disks.free_blocks,disks.virtualblock_status[1]
+	create_disk(0,5)
+	create_disk(5,5)
+	disk_write(1,4,45,next)	
+	print disks.second_copy[9],read_data(data,9,10,80),'Case 4',read_data(data,disks.second_copy[9],60,20)
+	print disk_read(1,4,50,data,30),'Case 6'
+	print read_data(data,12,0,100),'Case 7'	
+	print data
+	print disks.virtualdisk_block[0],disks.virtualdisk_block[1],2 in disks.free_blocks
+TestWrite()
